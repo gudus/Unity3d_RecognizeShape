@@ -36,8 +36,8 @@ public class DrawOnScreen : MonoBehaviour {
         else if (Input.GetMouseButtonUp(0))
         {
             isMousePressed = false;
-            //GetCountVectex2(pointsList, 10, 1);
-            CheckLine(pointsList);
+            GetCountVectex2(pointsList, angleNumber, errorAngle);
+            //CheckLine(pointsList);
         }
 
         if (isMousePressed)
@@ -79,10 +79,15 @@ public class DrawOnScreen : MonoBehaviour {
         return listTemps.Count;
     }
 
-    public int stepCount = 1;
+    public int stepCount = 2;
+    public float angleNumber = 90;
+    public float errorAngle = 1;
     private int GetCountVectex2(List<Vector3> list, float angle, float error)
     {
         List<Vector3> listTemps = new List<Vector3>();
+        int count = 0;
+        string angles = "";
+        string testA = "";
         for (int i = 0; i < list.Count; i++)
         {
             if ((i + stepCount * 2 )< list.Count)
@@ -91,13 +96,32 @@ public class DrawOnScreen : MonoBehaviour {
                 float a = GetVectorDistance(list[i], list[i + stepCount]);
                 float b = GetVectorDistance(list[i + stepCount], list[i + stepCount * 2]);
                 float c = GetVectorDistance(list[i + stepCount * 2], list[i]);
+                //float d = GetVectorDistance(list[i + stepCount * 2], list[i]);
                 //находим углы треугольника
                 float A = Mathf.Acos((b * b + c * c - a * a) / (2 * b * c)) * 180 / Mathf.PI;
                 float B = Mathf.Acos((a * a + c * c - b * b) / (2 * a * c)) * 180 / Mathf.PI;
                 float C = Mathf.Acos((a * a + b * b - c * c) / (2 * a * b)) * 180 / Mathf.PI;
-                Debug.Log(" <A=" + A + " <B=" + b + " <C=" + c);
+
+                TheLine line1 = new TheLine() { Point1 = list[i], Point2 = list[i + stepCount] };
+                TheLine line2 = new TheLine() { Point1 = list[i + stepCount], Point2 = list[i + stepCount * 2] };
+                
+                float ortLine = CheckOrtogonal(line1, line2);
+                if (ortLine == 0)
+                {
+                    count++;
+                    angles += " <A=" + A + " <B=" + B + " <C=" + C+"\n";
+                }
+                if (C > angle-error & C < error + angle)
+                {
+                    testA += " <A=" + A + " <B=" + B + " <C=" + C + "\n";
+                }
+                //Debug.Log("Lines is ort=" + ortLine);
+                //Debug.Log(" <A=" + A + " <B=" + B + " <C=" + C);
             }
         }
+        Debug.Log(count);
+        Debug.Log("orto="+angles);
+        Debug.Log("AnglesTest=" + testA);
         return listTemps.Count;
     }
 
